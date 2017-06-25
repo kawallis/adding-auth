@@ -5,8 +5,26 @@ const assert = require('chai').assert;
 describe('Brews api', () => {
     before(db.drop);
 
+    let token = {
+        Authorization: ''
+    };
+
+    let user = {
+        email: 'jojo@jo.com',
+        password: 'idontknow'
+    };
+
+    before(() => {
+        return request.post('/api/auth/signup')
+            .send({ email: 'me@me.com', password: 'abc' })
+            .then(res => {
+                token.Authorization = res.body.token;
+            });
+    });
+
     it('initial /GET returns no brewski', () => {
         return request.get('/api/brew')
+            .set(token)
             .then(brews => {
                 console.log(brews.body);
                 assert.deepEqual(brews.body.length, 0);
@@ -22,6 +40,7 @@ describe('Brews api', () => {
         };
 
         return request.post('/api/brew')
+            .set(token)
             .send(brew)
             .then(brewski => {
                 let {body} = brewski;
@@ -34,6 +53,7 @@ describe('Brews api', () => {
 
     it('gets a brew by its id', () => {
         return request.get(`/api/brew/${brew._id}`)
+            .set(token)
             .then(brewski => {
                 let {body} = brewski;
                 assert.deepEqual(body, brew);
@@ -45,6 +65,7 @@ describe('Brews api', () => {
             abv: 3.4
         };
         return request.put(`/api/brew/${brew._id}`)
+            .set(token)
             .send(obj)
             .then(brewski => {
                 let {body} = brewski;
@@ -54,6 +75,7 @@ describe('Brews api', () => {
 
     it('deletes a brewski', () => {
         return request.delete(`/api/brew/${brew._id}`)
+            .set(token)
             .then(message => {
                 assert.equal('Yo drink got drunk', message.text);
             });
