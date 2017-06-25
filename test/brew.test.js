@@ -13,7 +13,7 @@ describe('Brews api', () => {
         email: 'jojo@jo.com',
         password: 'idontknow'
     };
-
+    //sets auth
     before(() => {
         return request.post('/api/auth/signup')
             .send({ email: 'me@me.com', password: 'abc' })
